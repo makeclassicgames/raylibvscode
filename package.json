@@ -9,13 +9,31 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "raylibextension.helloWorld",
-        "title": "Hello World"
+        "command": "raylibextension.createproject",
+        "title": "Create Raylib Project"
+      },
+      {
+        "command": "raylibextension.build",
+        "title": "Build Raylib Project"
+      },
+      {
+        "command": "raylibextension.clean",
+        "title": "Clean Raylib Project"
+      },
+      {
+        "command": "raylibextension.rebuild",
+        "title": "Rebuild Raylib Project"
+      },
+      {
+        "command": "raylibextension.compileandrun",
+        "title": "Compile and Run Raylib Project"
       }
     ]
   },
