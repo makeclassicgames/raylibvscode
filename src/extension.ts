@@ -1,14 +1,27 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { CommandManager } from './commandManager';
+import { CommandManager, CommandManagerDarwin, CommandManagerLinux, CommandManagerWindows } from './commandManager';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	let commandManager = new CommandManager(context);
-
+	let commandManager:CommandManager|null = null;
+	
+	switch(process.platform.toString()){
+		case 'win32':
+			commandManager = new CommandManagerWindows(context);
+			break;
+		case 'linux':
+			commandManager = new CommandManagerLinux(context);
+			break;
+		case 'darwin':
+			commandManager = new CommandManagerDarwin(context);
+			break;
+		default:
+			throw new Error("Unsupported Platform");
+	}
 
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)

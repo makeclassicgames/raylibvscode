@@ -35,6 +35,19 @@
         "command": "raylibextension.compileandrun",
         "title": "Compile and Run Raylib Project"
       }
+    ],
+    "configuration":[
+      {
+        "title": "Raylib Extension",
+        "properties": {
+          "raylib.mingwpath":{
+            "title": "Mingw Installation Path",
+            "type": "string",
+            "default": "",
+            "description": "MinGW Binaries Installation Path"
+          }
+        }
+      }
     ]
   },
   "scripts": {
