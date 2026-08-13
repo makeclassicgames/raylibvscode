@@ -11,13 +11,13 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	switch(process.platform.toString()){
 		case 'win32':
-			commandManager = new CommandManagerWindows(context);
+			commandManager = new CommandManagerWindows();
 			break;
 		case 'linux':
-			commandManager = new CommandManagerLinux(context);
+			commandManager = new CommandManagerLinux();
 			break;
 		case 'darwin':
-			commandManager = new CommandManagerDarwin(context);
+			commandManager = new CommandManagerDarwin();
 			break;
 		default:
 			throw new Error("Unsupported Platform");

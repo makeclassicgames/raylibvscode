@@ -3,10 +3,8 @@ import * as vscode from 'vscode';
 
 export abstract class CommandManager {
 
-    private context: vscode.ExtensionContext;
 
-    constructor(context: vscode.ExtensionContext) {
-        this.context = context;
+    constructor() {
     }
 
 
@@ -20,8 +18,8 @@ export abstract class CommandManager {
 
 export class CommandManagerLinux extends CommandManager {
 
-    constructor(context: vscode.ExtensionContext) {
-        super(context);
+    constructor() {
+        super();
     }
 
     public buildCommand() {
@@ -45,17 +43,23 @@ export class CommandManagerLinux extends CommandManager {
 export class CommandManagerWindows extends CommandManager {
     public buildCommand(): void {
         const mingwpath:string = vscode.workspace.getConfiguration().get("raylib.mingwpath","");
-        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`${mingwpath}make`, { cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
-
+        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`/c ${mingwpath}make`, {executable:"cmd", cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
     }
     public cleanCommand(): void {
-        throw new Error('Method not implemented.');
+        const mingwpath:string = vscode.workspace.getConfiguration().get("raylib.mingwpath","");
+        const setPath:string = `set %PATH%='%PATH%;${mingwpath}'`;
+        const delcommand:string = `del *.o *.exe /s`
+        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`/c ${setPath} && ${delcommand}`, {executable:"cmd", cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
     }
     public rebuildCommand(): void {
-        throw new Error('Method not implemented.');
+        const mingwpath:string = vscode.workspace.getConfiguration().get("raylib.mingwpath","");
+        const setPath:string = `set %PATH%='%PATH%;${mingwpath}'`;
+        const delcommand:string = `del *.o *.exe /s`
+        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`/c ${setPath} && ${delcommand} && ${mingwpath}make`, {executable:"cmd", cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
     }
     public compileAndRunCommand(): void {
-        throw new Error('Method not implemented.');
+        const mingwpath:string = vscode.workspace.getConfiguration().get("raylib.mingwpath","");
+        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`/c ${mingwpath}make && for /f %i in ('dir /b /s *.exe') do set variable=%i && %i`, {executable:"cmd", cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
     }
 
 }
