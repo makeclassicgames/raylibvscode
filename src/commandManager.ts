@@ -46,7 +46,7 @@ export class CommandManagerLinux extends CommandManager {
 
         const compileThreads:number = vscode.workspace.getConfiguration().get("raylib.compilethreads",1);
 
-        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`make -j${compileThreads} ${extraMakeParams} && ./test3`, { cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
+        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`make -j${compileThreads} ${extraMakeParams} && $(find . -type f -executable)`, { cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
     }
 }
 
