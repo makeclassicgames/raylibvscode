@@ -3,6 +3,7 @@
   "displayName": "raylibextension",
   "description": "Raylib Oficial VScode Extension",
   "version": "0.0.1",
+  "icon": "resources/Raylib_logo.png",
   "engines": {
     "vscode": "^1.125.0"
   },
@@ -34,6 +35,10 @@
       {
         "command": "raylibextension.compileandrun",
         "title": "Compile and Run Raylib Project"
+      },
+      {
+        "command": "raylibextension.buildwithextra",
+        "title": "Build with params"
       }
     ],
     "configuration":[
@@ -45,9 +50,28 @@
             "type": "string",
             "default": "",
             "description": "MinGW Binaries Installation Path"
+          },
+          "raylib.rpcpath":{
+            "title": "Raylib Project Creator path",
+            "type": "string",
+            "default":"",
+            "description": "Raylib Project Creator path"
+          },
+          "raylib.compilethreads":{
+            "title": "Number of Compile Threads",
+            "type": "number",
+            "default": 1,
+            "description": "-J Parameter when calling Make"
+          },
+          "raylib.extrabuildparams":{
+            "title": "Extra Parameters when Build",
+            "type": "string",
+            "default": "",
+            "description": "Extra parameters when call make (To All calls)"
           }
         }
       }
+
     ]
   },
   "scripts": {
@@ -56,7 +80,7 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test --label Mistests"
   },
   "devDependencies": {
     "@types/vscode": "^1.125.0",

@@ -32,9 +32,10 @@ export function activate(context: vscode.ExtensionContext) {
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
 	const disposablecp = vscode.commands.registerCommand('raylibextension.createproject', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from raylibextension!');
+		const rpcpath:string = vscode.workspace.getConfiguration().get("raylib.rpcpath","");
+		
+		vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`${rpcpath}`, { cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
+		
 	});
 	const disposablebuild = vscode.commands.registerCommand('raylibextension.build', () => {
 		// The code you place here will be executed every time your command is executed
@@ -57,34 +58,51 @@ export function activate(context: vscode.ExtensionContext) {
 		commandManager.compileAndRunCommand();
 	});
 
+	const disposableBuildWithParams = vscode.commands.registerCommand('raylibextension.buildwithextra', () =>{
+		vscode.window.showInputBox(
+			{
+				prompt: "Insert Extra Build Params"
+			}
+		).then(params =>{
+			commandManager.buildCommand(params);
+		});
+	});
+
 	context.subscriptions.push(disposablecp);
 	context.subscriptions.push(disposablebuild);
 	context.subscriptions.push(disposableclean);
 	context.subscriptions.push(disposablecompileandrun);
 	context.subscriptions.push(disposablerebuild);
+	context.subscriptions.push(disposableBuildWithParams);
 
 	addStatusBarButtons(context);
+
+	
 }
 
 function addStatusBarButtons(context: vscode.ExtensionContext) {
-  let buildButton:vscode.StatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
+	let buildWithParamsButton:vscode.StatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left,1);
+		buildWithParamsButton.text="$(gear) Build...";
+		buildWithParamsButton.tooltip = "Build Raylib project With Params";
+		buildWithParamsButton.command = "raylibextension.buildwithextra";
+		buildWithParamsButton.show();
+	let buildButton:vscode.StatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2);
        buildButton.text = "$(gear) Build";
        buildButton.tooltip = "Build Raylib Project";
        buildButton.command = "raylibextension.build";
        buildButton.show();
-
-	let  cleanButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2);
+	let  cleanButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 3);
         cleanButton.text = "$(trash) Clean";
         cleanButton.tooltip = "Clean Raylib Project";
         cleanButton.command = "raylibextension.clean";
         cleanButton.show();
 
-	let  rebuildButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 3);
+	let  rebuildButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4);
         rebuildButton.text = "$(refresh) Rebuild";
         rebuildButton.tooltip = "Rebuild Raylib Project";
         rebuildButton.command = "raylibextension.rebuild";
         rebuildButton.show();
-	let compileAndRunButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4);
+	let compileAndRunButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 5);
 		compileAndRunButton.text = "$(play) Compile and Run";
 		compileAndRunButton.tooltip = "Compile and Run Raylib Project";
 		compileAndRunButton.command = "raylibextension.compileandrun";

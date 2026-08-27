@@ -8,7 +8,7 @@ export abstract class CommandManager {
     }
 
 
-    public abstract buildCommand(): void;
+    public abstract buildCommand(extraParams?:string|undefined): void;
     public abstract cleanCommand(): void;
 
     public abstract rebuildCommand(): void;
@@ -22,50 +22,69 @@ export class CommandManagerLinux extends CommandManager {
         super();
     }
 
-    public buildCommand() {
-        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution('make', { cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
+    public buildCommand(extraParams?:string|undefined) {
+        if(!extraParams)
+            extraParams="";
+        const extraMakeParams:string= vscode.workspace.getConfiguration().get("raylib.extrabuildparams","");
+        const compileThreads:number = vscode.workspace.getConfiguration().get("raylib.compilethreads",1);
+        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`make -j${compileThreads} ${extraMakeParams} ${extraParams}`, { cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
     }
     public cleanCommand() {
         vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution('make clean', { cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
     }
 
     public rebuildCommand() {
-        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution('make clean && make', { cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
+        const extraMakeParams:string= vscode.workspace.getConfiguration().get("raylib.extrabuildparams","");
+        const compileThreads:number = vscode.workspace.getConfiguration().get("raylib.compilethreads",1);
+
+        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`make clean && make -j${compileThreads} ${extraMakeParams}`, { cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
     }
 
     public compileAndRunCommand() {
         //TODO Search for a way to run the compiled program in the terminal and not in the output window
-        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution('make && ./test3', { cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
+        const extraMakeParams:string= vscode.workspace.getConfiguration().get("raylib.extrabuildparams","");
+
+        const compileThreads:number = vscode.workspace.getConfiguration().get("raylib.compilethreads",1);
+
+        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`make -j${compileThreads} ${extraMakeParams} && ./test3`, { cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
     }
 }
 
 
 export class CommandManagerWindows extends CommandManager {
-    public buildCommand(): void {
+    public buildCommand(extraParams?:string|undefined): void {
+        if(!extraParams)
+            extraParams="";
+        const extraMakeParams:string= vscode.workspace.getConfiguration().get("raylib.extrabuildparams","");
+        const compileThreads:number = vscode.workspace.getConfiguration().get("raylib.compilethreads",1);
         const mingwpath:string = vscode.workspace.getConfiguration().get("raylib.mingwpath","");
-        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`/c ${mingwpath}make`, {executable:"cmd", cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
+        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`/c ${mingwpath}make -j${compileThreads} ${extraMakeParams} ${extraParams}`, {executable:"cmd", cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
     }
     public cleanCommand(): void {
         const mingwpath:string = vscode.workspace.getConfiguration().get("raylib.mingwpath","");
         const setPath:string = `set %PATH%='%PATH%;${mingwpath}'`;
-        const delcommand:string = `del *.o *.exe /s`
+        const delcommand:string = `del *.o *.exe /s`;
         vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`/c ${setPath} && ${delcommand}`, {executable:"cmd", cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
     }
     public rebuildCommand(): void {
+        const extraMakeParams:string= vscode.workspace.getConfiguration().get("raylib.extrabuildparams","");
+        const compileThreads:number = vscode.workspace.getConfiguration().get("raylib.compilethreads",1);
         const mingwpath:string = vscode.workspace.getConfiguration().get("raylib.mingwpath","");
         const setPath:string = `set %PATH%='%PATH%;${mingwpath}'`;
-        const delcommand:string = `del *.o *.exe /s`
-        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`/c ${setPath} && ${delcommand} && ${mingwpath}make`, {executable:"cmd", cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
+        const delcommand:string = `del *.o *.exe /s`;
+        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`/c ${setPath} && ${delcommand} && ${mingwpath}make -j${compileThreads} ${extraMakeParams}`, {executable:"cmd", cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
     }
     public compileAndRunCommand(): void {
+        const extraMakeParams:string= vscode.workspace.getConfiguration().get("raylib.extrabuildparams","");
+        const compileThreads:number = vscode.workspace.getConfiguration().get("raylib.compilethreads",1);
         const mingwpath:string = vscode.workspace.getConfiguration().get("raylib.mingwpath","");
-        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`/c ${mingwpath}make && for /f %i in ('dir /b /s *.exe') do set variable=%i && %i`, {executable:"cmd", cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
+        vscode.tasks.executeTask(new vscode.Task({ type: 'shell' }, vscode.TaskScope.Workspace, 'make', 'raylibextension', new vscode.ShellExecution(`/c ${mingwpath}make -j${compileThreads} ${extraMakeParams} && for /f %i in ('dir /b /s *.exe') do set variable=%i && %i`, {executable:"cmd", cwd: vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/src' })));
     }
 
 }
 
 export class CommandManagerDarwin extends CommandManager{
-    public buildCommand(): void {
+    public buildCommand(extraParams?:string|undefined): void {
         throw new Error('Method not implemented.');
     }
     public cleanCommand(): void {

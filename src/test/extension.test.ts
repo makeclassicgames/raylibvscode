@@ -17,15 +17,16 @@ suite('Extension Test Suite', () => {
 	test('Build test', async () => {
 	
 		let result = await vscode.commands.executeCommand<boolean>("raylibextension.build");
-
+	
 		//Comprobar que existe .exe
 		assert.equal(existsSync("C:\\raylib\\projects\\test_project2\\src\\test_project2.exe"), true);
 	});
-	test('Clean test', () =>{
+	test('Clean test', async () =>{
 		//clean command
-		commandManager.cleanCommand();
+		let result = await vscode.commands.executeCommand<boolean>("raylibextension.clean");
+
 		//comprobar que NO hay .exe
-		assert.equal(!existsSync("C:\\raylib\\projects\\test_project2\\src\\test_project2.exe"), true);
+		assert.equal(existsSync("C:\\raylib\\projects\\test_project2\\src\\test_project2.exe"), false);
 
 	});
 });
