@@ -53,7 +53,7 @@ This is an alpha version of the Raylib Visual Studio Code extension, and there m
 
 ## Documentation
 
-
+You can see the full documentation for the Raylib Vscode Extension on the [Raylib Vscode Extension Documentation](https://makeclassicgames.codeberg.page/raylibvscodedocs/).
 
 ## License
 
