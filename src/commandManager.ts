@@ -1,21 +1,70 @@
+/*
+* Raylib Visual Studio Code Extension
+* Copyright (C) 2026  Make Classic Games
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
+* 
+* 
+* License: GNU General Public License v3.0
+* Author: Make Classic Games <https://makeclassicgames.dev>
+* Date: 2026-09-10
+* Version: 1.0.0
+*/
+
 import * as vscode from 'vscode';
 
-
+/**
+ * CommandManager is an abstract class that defines the interface for managing commands in the Raylib Visual Studio Code Extension. It provides methods for building, cleaning, rebuilding, and compiling and running commands. The specific implementations of these methods are provided by subclasses for different platforms (Linux, Windows, and Darwin).
+ * @author Make Classic Games <https://makeclassicgames.dev>
+ * @version 1.0.0
+ * @since 2026-09-10
+ */
 export abstract class CommandManager {
 
 
+    /** Default constructor */
     constructor() {
     }
 
-
+    /**
+     * Execute Build Command: Compile the current project using the specified build parameters. If extra parameters are provided, they will be appended to the build command.
+     * @param extraParams Extra Build paramters (Optionals)
+     */
     public abstract buildCommand(extraParams?:string|undefined): void;
+    /**
+     * Execute Clean Command: Clean the build artifacts of the current project.
+     */
     public abstract cleanCommand(): void;
 
+    /**
+     * Execute Rebuild Command: Clean and then compile the current project using default settings.
+     */
     public abstract rebuildCommand(): void;
 
+    /**
+     * Execute Compile and then run the generated executable.
+     */
     public abstract compileAndRunCommand(): void;
 }
 
+
+/**
+ * CommandManagerLinux is a concrete implementation of the CommandManager class for Linux platforms.
+ * @author Make Classic Games <https://makeclassicgames.dev>
+ * @version 1.0.0
+ * @since 2026-09-10
+ * @see CommandManager
+ */
 export class CommandManagerLinux extends CommandManager {
 
     constructor() {
@@ -50,7 +99,14 @@ export class CommandManagerLinux extends CommandManager {
     }
 }
 
-
+/**
+ * CommandManagerWindows is a concrete implementation of the CommandManager class for Windows platforms.
+ * Its uses MinGW to compile the project and execute the commands. Needs to be configured in extension configuration settings.
+ * @author Make Classic Games <https://makeclassicgames.dev>
+ * @version 1.0.0
+ * @since 2026-09-10
+ * @see CommandManager
+ */
 export class CommandManagerWindows extends CommandManager {
     public buildCommand(extraParams?:string|undefined): void {
         if(!extraParams)
@@ -83,6 +139,13 @@ export class CommandManagerWindows extends CommandManager {
 
 }
 
+/**
+ * CommandManagerDarwin is a concrete implementation of the CommandManager class for macOS (Darwin) platforms.
+ * @author Make Classic Games <https://makeclassicgames.dev>
+ * @version 1.0.0
+ * @since 2026-09-10
+ * @see CommandManager
+ */
 export class CommandManagerDarwin extends CommandManager{
     public buildCommand(extraParams?:string|undefined): void {
         throw new Error('Method not implemented.');
